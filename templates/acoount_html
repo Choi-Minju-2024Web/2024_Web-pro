@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Accounts</title>
-		<meta charset="UTF-8">
-	</head>
-	<body>
-		<form action = "/accounts/" method="POST">
-			<input type="text" id="username" name = "username" required>
-		</form>
-	</body>
+   <head>
+      <title>Accounts</title>
+      <meta charset="UTF-8">
+   </head>
+
 </html>
