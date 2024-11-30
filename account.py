@@ -17,7 +17,7 @@ def account():
            return "유저 이미 존재"
        conn.close()
        return redirect('/account/')
-    return render_template('register.html')
+    return render_template('account.html')
         
 if __name__ == '_main_':
     app.debug = True
