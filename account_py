@@ -1,4 +1,0 @@
-from flask import Flask, render_template,request,redirect
-import sqlite3
-
-@app.route('/account/', methods=['GET', 'POST'])
