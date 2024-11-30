@@ -16,8 +16,9 @@ def account():
        except sqlite3.IntegrityError:
            return "유저 이미 존재"
        conn.close()
-       return redirect('/account/')    
-
+       return redirect('/account/')
+    return render_template('register.html')
+        
 if __name__ == '_main_':
     app.debug = True
     app.run(host='127.0.0.1', port=5000)
