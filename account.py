@@ -18,7 +18,19 @@ def account():
       #html 폼에서 입력받은 값 각각 가져오기
       username = request.form['username']
       password = request.form['password']
-
+      #유저 저장
+      try:
+         cursor.execute('INSERT INTO user (username,password) VALUES (?,?)', (username,password))
+         db.commit()
+      # 만약 유저이름이 중복되면 에러 메시지 반환   
+      except sqlite3.IntegrityError:
+         return "이미 존재하는 이름입니다."
+      db.close()
+      # 저장에 성공하면 다시 '/account/'로
+      return redirect('/account/')
+   # GET 요청일 경우 account.html 파일 반환해 이용자에게 표시
+   return render_template('account.html')   
+ 
 if __name__ == '__main__':
    app.debug = True
    app.run(host = '127.0.0.1',port = 5000) #포트 5000에서 실행
