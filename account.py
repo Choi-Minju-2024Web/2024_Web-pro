@@ -8,6 +8,12 @@ app = Flask(__name__)
 app.secret_key = 'secret_key'
 
 @app.route('/')
+#로그인 시 대쉬보드로 이동
+def home():
+   if 'username' in session:
+      return redirect('/dashboard/')
+   return redirect('/account/')
+
 @app.route('/account/', methods = ['GET','POST'])
 #함수 선언
 def account():
