@@ -43,8 +43,8 @@ def account():
 
 @app.route('/login/',methods = ['POST'])
 def login():
-   username = request.form['username']
-   password = request.form['password']
+   username = request.form.get('username')
+   password = request.form.get('password')
    db = sqlite3.connect('Table1.db')
    cursor = db.cursor()
    cursor.execute('SELECT * FROM user WHERE username = ? AND password = ?', (username,password))
