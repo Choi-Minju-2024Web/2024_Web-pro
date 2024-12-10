@@ -26,12 +26,12 @@ def account():
       #html 폼에서 입력받은 값 각각 가져오기
       username = request.form['username']
       password = request.form['password']
-      field = request.form['field']
-      experience = request.form['experience']
+      field = request.form.get('field')
+      experience =int(request.form.get('experience'))
 
       #유저 저장
       try:
-         cursor.execute('INSERT INTO user (username,password,field,experience) VALUES (?,?,?,?)', (username,password,field,experience))
+         cursor.execute('INSERT INTO user (username, password, field, experience) VALUES (?, ?, ?, ?)', (username, password, field, experience))
          db.commit()
          #로그인 시 세션에 username 저장하기
          session['username'] = username
