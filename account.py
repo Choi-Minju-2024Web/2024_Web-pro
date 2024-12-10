@@ -63,6 +63,11 @@ def dashboard():
       return redirect('/account/')
    return render_template('dashboard.html',username = session['username'])
 
+@app.route('/logout/')
+def logout():
+   session.pop('username',None) #세션 제거하기
+   return redirect('/account/')
+
 if __name__ == '__main__':
    app.debug = True
    app.run(host = '127.0.0.1',port = 5000) #포트 5000에서 실행
