@@ -57,6 +57,12 @@ def login():
       return redirect('/dashboard/')
    return "로그인 실패"
 
+@app.route('/dashboard/')
+def dashboard():
+   if 'username' not in session:
+      return redirect('/account/')
+   return render_template('dashboard.html',username = session['username'])
+
 if __name__ == '__main__':
    app.debug = True
    app.run(host = '127.0.0.1',port = 5000) #포트 5000에서 실행
