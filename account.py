@@ -41,6 +41,22 @@ def account():
    # GET 요청일 경우 account.html 파일 반환해 이용자에게 표시
    return render_template('account.html')   
 
+@app.route('/login/',methods = ['POST'])
+def login():
+   username = request.form['username']
+   password = request.form['password']
+   db = sqlite3.connect('Table1.db')
+   cursor = db.cursor()
+   cursor.execute('SELECT * FROM user WHERE username = ? AND password = ?', (username,password))
+   # 가입된 유저 정보 가져오기
+   user = cursor.fetchone()
+   db.close()
+   if user:
+      #로그인 성공
+      session['username']= username
+      return redirect('/dashboard/')
+   return "로그인 실패"
+
 if __name__ == '__main__':
    app.debug = True
    app.run(host = '127.0.0.1',port = 5000) #포트 5000에서 실행
