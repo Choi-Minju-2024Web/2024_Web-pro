@@ -10,5 +10,12 @@
 		<span> 반갑습니다, {{ username }}님</span>
 		<a href ="/logout">로그아웃</a>
 		<a href="/dashboard/">Go back to Dashboard</a>
+		<form action="/match/" method="POST">
+		<select name="role" id="role" required>
+			<label for="role">Role:</label>
+				<option value="mentor">Mentor</option>
+				<option value="mentee">Mentee</option>
+		</select>		
+		</form>
 	</body>
 </html>
