@@ -71,6 +71,18 @@ def logout():
    session.pop('username',None) #세션 제거하기
    return redirect('/account/')
 
+@app.route('/match/')
+def match():
+   if 'username' not in session:
+      return redirect('account')
+   return render_template('match.html')
+
+@app.route('/schedule/')
+def schedule():
+   if 'username' not in session:
+      return redirect('/account/')
+   return render_template('schedule.html')
+
 if __name__ == '__main__':
    app.debug = True
    app.run(host = '127.0.0.1',port = 5000) #포트 5000에서 실행
