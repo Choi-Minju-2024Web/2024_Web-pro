@@ -78,26 +78,16 @@ def match():
 
    if request.method == 'POST':
       role = request.form['role'] #멘토 멘티 역할 선택
-      desired_field = request.form['desired_field']
-      desired_experience =int(request.form['desired_experience'])
-
       db = sqlite3.connect('Table1.db')
       cursor=db.cursor()
 
-      cursor.execute('''
-            UPDATE user SET role = ? WHERE username = ?
-        ''', (role, session['username']))
-      db.commit()
-
       #매칭 사용자 찾기
       if role == 'mentor':
-         cursor.execute('''
-            SELECT * FROM user WHERE field = ? AND experience <= ? AND role = 'mentee'
-        ''', (desired_field, desired_experience))
-      else:
-         cursor.execute('''
-            SELECT * FROM user WHERE field = ? AND experience >= ? AND role = 'mentor'
-        ''', (desired_field, desired_experience))
+         cursor.execute("SELECT * FROM user WHERE role = 'mentee'")
+      elif role == 'mentee':
+         cursor.execute("SELECT * FROM user WHERE role = 'mentor'")
+      elif role == 'team':
+         cursor.execute("SELECT * FROM user WHERE role = 'team'")
       matches = cursor.fetchall()
       db.close()
 

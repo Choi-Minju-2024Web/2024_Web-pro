@@ -12,10 +12,12 @@
 		<a href="/dashboard/">Go back to Dashboard</a>
 		<h3>매칭된 유저</h3>
 		<ul>
-			{% for match in matched %}
+			{% for match in matches %}
 				<li>
-					{{match[0]}} - {{match[1]}}
-					<a href="/contact/{{match[0]}}">Contact</a>
+					<strong>이름:</strong> {{ match[1] }}<br>
+                	<strong>분야:</strong> {{ match[3] }}<br>
+                	<strong>경험:</strong> {{ match[4] }}<br>
+                	<a href="/contact/{{ match[1] }}">연락하기</a>
 				</li>
 				{% endfor %}
 		</ul>
