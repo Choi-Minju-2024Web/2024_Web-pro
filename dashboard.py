@@ -5,6 +5,7 @@ from dashboard import dashboard_bp
 # Blueprint 객체 생성
 dashboard_bp = Blueprint('dashboard', __name__)
 
+@dashboard_bp.route('/board')
 def dashboard():
    if 'username' not in session:
       return redirect('/account/')
@@ -14,8 +15,6 @@ def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
-
-@app.route('/board')
 def board():
     conn = get_db_connection()
     posts = conn.execute('SELECT * FROM posts').fetchall()
@@ -46,5 +45,3 @@ def create_post():
 
     return render_template('create_post.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
