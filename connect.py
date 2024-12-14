@@ -9,7 +9,7 @@ connect_bp = Blueprint('connect', __name__)
 @connect_bp.route('/connect/',methods=['GET'])
 def connect():
    if 'username' not in session:
-      return redirect('account')
+      return redirect('/account/')
    
    username = session['username']
 
@@ -19,5 +19,5 @@ def connect():
    connect_user = cursor.fetchone()
    db.close()
    if connect_user:
-       return render_template('contact.html', user=connect_user)
+       return render_template('connect.html', user=connect_user)
    return "사용자를 찾을 수 없습니다."

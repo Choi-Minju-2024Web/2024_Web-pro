@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session
 # flask 프레임워크를 가져오고, 템플릿 렌더링, 클라이언트 요청 처리
 # 사용자 다른 URL로 연결
 import sqlite3 #SQLite 데이터베이스를 사용하기 위함
+from dashboard import create_dashboard_bp
 from match import match_bp
 from connect import connect_bp
 
@@ -10,8 +11,10 @@ app = Flask(__name__)
 app.secret_key = 'secret_key'
 
 # Blueprint 등록
-app.register_blueprint(match_bp)
-app.register_blueprint(connect_bp)
+dashboard_bp = create_dashboard_bp()
+app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+app.register_blueprint(match_bp, url_prefix='/match')
+app.register_blueprint(connect_bp, url_prefix='/connect')
 
 @app.route('/')
 #로그인 시 대쉬보드로 이동
