@@ -64,12 +64,6 @@ def login():
       return redirect('/dashboard/')
    return "로그인 실패"
 
-@app.route('/dashboard/')
-def dashboard():
-   if 'username' not in session:
-      return redirect('/account/')
-   return render_template('dashboard.html',username = session['username'])
-
 @app.route('/logout/')
 def logout():
    session.pop('username',None) #세션 제거하기

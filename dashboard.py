@@ -1,7 +1,14 @@
-from flask import Flask, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, session
 import sqlite3
+from dashboard import dashboard_bp
 
-app = Flask(__name__)
+# Blueprint 객체 생성
+dashboard_bp = Blueprint('dashboard', __name__)
+
+def dashboard():
+   if 'username' not in session:
+      return redirect('/account/')
+   return render_template('dashboard.html',username = session['username'])
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
