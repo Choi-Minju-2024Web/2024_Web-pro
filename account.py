@@ -71,29 +71,6 @@ def logout():
    session.pop('username',None) #세션 제거하기
    return redirect('/account/')
 
-@app.route('/match/',methods=['GET','POST'])
-def match():
-   if 'username' not in session:
-      return redirect('account')
-
-   if request.method == 'POST':
-      role = request.form['role'] #멘토 멘티 역할 선택
-      db = sqlite3.connect('Table1.db')
-      cursor=db.cursor()
-
-      #매칭 사용자 찾기
-      if role == 'mentor':
-         cursor.execute("SELECT * FROM user WHERE role = 'mentee'")
-      elif role == 'mentee':
-         cursor.execute("SELECT * FROM user WHERE role = 'mentor'")
-      elif role == 'team':
-         cursor.execute("SELECT * FROM user WHERE role = 'team'")
-      matches = cursor.fetchall()
-      db.close()
-
-      return render_template('match_result.html',matches = matches)
-   return render_template('match.html')
-
 @app.route('/schedule/')
 def schedule():
    if 'username' not in session:
