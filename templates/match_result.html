@@ -6,10 +6,18 @@
 	<meta charset = "UTF-8">
 	</head>
 	<body>
-		<div>팀 매칭</div>
+		<div>팀 매칭 유저</div>
 		<span> 반갑습니다, {{ username }}님</span>
 		<a href ="/logout">로그아웃</a>
 		<a href="/dashboard/">Go back to Dashboard</a>
-		
+		<h3>매칭된 유저</h3>
+		<ul>
+			{% for match in matched %}
+				<li>
+					{{match[0]}} - {{match[1]}}
+					<a href="/contact/{{match[0]}}">Contact</a>
+				</li>
+				{% endfor %}
+		</ul>
 	</body>
 </html>

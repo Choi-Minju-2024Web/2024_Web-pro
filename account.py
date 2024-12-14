@@ -75,13 +75,13 @@ def logout():
 def match():
    if 'username' not in session:
       return redirect('account')
-   return render_template('match.html')
+
    if request.method == 'POST':
       role = request.form['role'] #멘토 멘티 역할 선택
       desired_field = request.form['desired_field']
       desired_experience =int(request.form['desired_experience'])
 
-      db.sqlite.connect('Table1.db')
+      db = sqlite3.connect('Table1.db')
       cursor=db.cursor()
 
       cursor.execute('''
@@ -92,13 +92,13 @@ def match():
       #매칭 사용자 찾기
       if role == 'mentor':
          cursor.execute('''
-            SELECT * FROM user WHERE field = ? AND experience >= ? AND role = 'mentee'
+            SELECT * FROM user WHERE field = ? AND experience <= ? AND role = 'mentee'
         ''', (desired_field, desired_experience))
       else:
          cursor.execute('''
-            SELECT * FROM user WHERE field = ? AND experience <= ? AND role = 'mentor'
+            SELECT * FROM user WHERE field = ? AND experience >= ? AND role = 'mentor'
         ''', (desired_field, desired_experience))
-      matched = cursor.fetchall()
+      matches = cursor.fetchall()
       db.close()
 
       return render_template('match_result.html',matches = matches)
