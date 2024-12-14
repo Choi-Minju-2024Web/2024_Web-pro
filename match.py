@@ -1,12 +1,12 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect, session
 # flask 프레임워크를 가져오고, 템플릿 렌더링, 클라이언트 요청 처리
 # 사용자 다른 URL로 연결
 import sqlite3 #SQLite 데이터베이스를 사용하기 위함
 
-app = Flask(__name__)
-app.secret_key = 'secret_key'
+# Blueprint 객체 생성
+match_bp = Blueprint('match', __name__)
 
-@app.route('/match/',methods=['GET','POST'])
+@match_bp.route('/match/',methods=['GET','POST'])
 def match():
    if 'username' not in session:
       return redirect('account')
