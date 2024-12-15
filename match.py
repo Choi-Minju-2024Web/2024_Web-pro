@@ -33,8 +33,6 @@ def match():
 def connect(username):
    if 'username' not in session:
       return redirect('/account/')
-   
-   username = session['username']
 
    db = sqlite3.connect('Table1.db')
    cursor = db.cursor()
@@ -53,7 +51,6 @@ def connect(username):
         (username, username),
     )
    confirmed_matches = [row[0] for row in cursor.fetchall()]
-
-   conn.close()
+   db.close()
 
    return render_template('connect.html', received_requests=received_requests,  confirmed_matches=confirmed_matches, )

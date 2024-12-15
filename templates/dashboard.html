@@ -15,7 +15,7 @@
         <h1>아이디어 및 협업 게시판</h1>
         <nav>
             <ul>
-                <a href="/connect/">매칭 요청 확인</a>
+                <a href="{{ url_for('match.connect', username=username) }}">매칭 요청 확인</a>
                 <a href="/match/">Match</a><br>
                 <a href="team.html">팀 관리</a>
             </ul>
