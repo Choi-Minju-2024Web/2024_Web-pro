@@ -23,6 +23,7 @@
         {% for match in confirmed_matches %}
         <li>
             <strong>유저 이름:</strong> {{ match }}
+			<a href="/disconnect_match/{{ match }}">매칭 끊기</a>
         </li>
         {% endfor %}
     </ul>
