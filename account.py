@@ -11,6 +11,7 @@ app.secret_key = 'secret_key'
 # Blueprint 등록
 app.register_blueprint(match_bp)
 
+
 @app.route('/')
 #로그인 시 대쉬보드로 이동
 def home():
