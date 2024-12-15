@@ -4,6 +4,21 @@
 	<head>
 	<title>Match Results</title>
 	<meta charset = "UTF-8">
+	<script>
+        function sendRequest(receiverUsername) {
+            fetch(`/send_request/${receiverUsername}`)
+                .then(response => {
+                    if (response.status === 204) {
+                        alert("매칭 요청이 성공적으로 전송되었습니다.");
+                    } else {
+                        alert("이미 요청을 보냈거나 오류가 발생했습니다.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        }
+    </script>
 	</head>
 	<body>
 		<div>팀 매칭 유저</div>
@@ -17,7 +32,7 @@
 					<strong>이름:</strong> {{ match[1] }}<br>
                 	<strong>분야:</strong> {{ match[3] }}<br>
                 	<strong>경력:</strong> {{ match[4] }}<br>
-                	<a href="/send_request/{{ match[1] }}">연락하기</a>
+                	<button onclick="sendRequest('{{ match[1] }}')">연락하기</button>
 				</li>
 				{% endfor %}
 		</ul>
