@@ -28,3 +28,19 @@ def match():
 
       return render_template('match_result.html', username=session['username'], matches=matches)
    return render_template('match.html',username=session['username'])
+
+@match_bp.route('/connect/<username>',methods=['GET'])
+def connect(username):
+   if 'username' not in session:
+      return redirect('/account/')
+   
+   username = session['username']
+
+   db = sqlite3.connect('Table1.db')
+   cursor = db.cursor()
+   cursor.execute("SELECT * FROM user WHERE username = ?",(username,))
+   connect_user = cursor.fetchone()
+   db.close()
+   if connect_user:
+       return render_template('connect.html', user=connect_user)
+   return "사용자를 찾을 수 없습니다."

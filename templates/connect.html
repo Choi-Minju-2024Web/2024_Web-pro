@@ -5,13 +5,11 @@
       <meta charset="UTF-8">
    </head>
    <body>
-      <h1>{{ user[1] }}님과 연락하기</h1>
-      <strong>분야:</strong> {{ user[3] }}<br>
-      <strong>경력:</strong> {{ user[4] }}<br>
-
-      <form action="/send_message/{{ user[1] }}" method="POST">
-         <textarea name="message" placeholder="메시지를 입력하세요." required></textarea><br>
-         <input type="submit" value="메시지 보내기">
-      </form>
+	<h1>연락하기</h1>
+    <p>연락할 사용자: {{ user[1] }}</p>  <!-- 예시로 user의 이름 출력 -->
+    <p>분야: {{ user[3] }}</p>
+    <p>경험: {{ user[4] }}</p>
+    
+    <a href="/dashboard/">대시보드로 돌아가기</a>
    </body>
 </html>
