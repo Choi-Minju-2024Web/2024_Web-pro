@@ -12,18 +12,31 @@
 		<a href="/dashboard/">Go back to Dashboard</a>
 		<h3>매칭된 사용자와의 일정</h3>
 
-    {% if matched_users %}
-        <h4>매칭된 사용자들</h4>
-        <ul>
-            {% for user in matched_users %}
-                <li>{{ user }} 
-                    <a href="/schedule/add/{{ user }}">일정 추가</a> | 
-                    <a href="/schedule/delete/{{ user }}">일정 삭제</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>매칭된 사용자가 없습니다.</p>
-    {% endif %}
+		<h3>새로운 일정 추가</h3>
+		<form action="/schedule/add" method="POST">
+			<label for="title">일정 제목:</label>
+			<input type="text" name="title" id="title" required><br>
+	
+			<label for="description">일정 설명:</label>
+			<textarea name="description" id="description"></textarea><br>
+	
+			<label for="start_time">시작 시간:</label>
+			<input type="datetime-local" name="start_time" id="start_time" required><br>
+	
+			<label for="end_time">종료 시간:</label>
+			<input type="datetime-local" name="end_time" id="end_time" required><br>
+	
+			<button type="submit">일정 추가</button>
+		</form>
+	
+		<h3>내 일정 목록</h3>
+		<ul>
+			{% for schedule in schedules %}
+				<li>
+					{{ schedule['title'] }} - {{ schedule['start_time'] }} ~ {{ schedule['end_time'] }}
+					<a href="/schedule/delete/{{ schedule['id'] }}">삭제</a>
+				</li>
+			{% endfor %}
+		</ul>
 	</body>
 </html>
