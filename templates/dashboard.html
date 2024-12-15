@@ -15,11 +15,8 @@
         <h1>아이디어 및 협업 게시판</h1>
         <nav>
             <ul>
-                <a href="/match/">Match</a>
-                <li><a href="index.html">홈</a></li>
-                <li><a href="board.html">게시판</a></li>
-                <li><a href="team.html">팀 관리</a></li>
-                <li><a href="profile.html">프로필</a></li>
+                <a href="/match/">Match</a><br>
+                <a href="team.html">팀 관리</a>
             </ul>
         </nav>
     </header>
@@ -27,10 +24,14 @@
     <main>
         <section class="posts">
             <h2>게시글 목록</h2>
-            <button onclick="location.href='create_post.html'">게시글 작성</button>
+            <form action="/create_post/" method="GET">
+                <button type="submit">게시글 작성</button>
+            </form>
+            
             <ul>
-                <li><a href="post1.html">게시글 제목 1</a></li>
-                <li><a href="post2.html">게시글 제목 2</a></li>
+                {% for post in posts %}
+                    <li><a href="/post/{{ post['id'] }}">{{ post['title'] }}</a></li>
+                {% endfor %}
             </ul>
         </section>
     </main>

@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, session
 # 사용자 다른 URL로 연결
 import sqlite3 #SQLite 데이터베이스를 사용하기 위함
 from match import match_bp
-
+from dashboard import dashboard_bp
 # 경로설정
 app = Flask(__name__)
 app.secret_key = 'secret_key'
