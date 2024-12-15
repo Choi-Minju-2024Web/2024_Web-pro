@@ -12,9 +12,15 @@ def match():
       return redirect('account')
 
    if request.method == 'POST':
-      role = request.form['role'] #멘토 멘티 역할 선택
+      role = request.form.get('role') #rol이 빈칸인 경우 방지하기 위해
+      print(f"Selected role: {role}")
+      if not role:
+        return "역할 없음", 400  # (role이 없을 경우)
+
       db = sqlite3.connect('Table1.db')
-      cursor=db.cursor()
+      cursor = db.cursor()
+      cursor.execute("UPDATE user SET role = ? WHERE username = ?", (role, session['username']))
+      db.commit()
 
       #매칭 사용자 찾기
       if role == 'mentor':
@@ -22,7 +28,7 @@ def match():
       elif role == 'mentee':
          cursor.execute("SELECT * FROM user WHERE role = 'mentor'")
       elif role == 'team':
-         cursor.execute("SELECT * FROM user WHERE role = 'team'")
+         cursor.execute("SELECT * FROM user WHERE role = 'team' AND username != ?", (session['username'],))
       matches = cursor.fetchall()
       db.close()
 
@@ -61,31 +67,25 @@ def send_request(receiver_username):
     cursor = conn.cursor()
 
     try:
-        # 이미 요청을 보낸 적이 있는지 확인 (상태가 'pending'인 요청이 있는지)
-        cursor.execute("""
-            SELECT * FROM matches 
-            WHERE sender_username = ? AND receiver_username = ? AND status = 'pending'
-        """, (sender_username, receiver_username))
+        # 이미 요청을 보낸 적이 있는지 확인 pending인 요청이 있는지
+        cursor.execute("""SELECT * FROM matches  WHERE sender_username = ? AND receiver_username = ? AND status = 'pending'""", (sender_username, receiver_username))
         existing_request = cursor.fetchone()
 
         if existing_request:
-            return '', 204  # 이미 요청을 보낸 경우, 상태 코드 204로 이미 요청을 보낸 경우를 처리
+            return '', 204  # 이미 요청을 보낸 경우
         
-        # 요청이 없다면 새로운 매칭 요청을 'pending' 상태로 DB에 추가
-        cursor.execute("""
-            INSERT INTO matches (sender_username, receiver_username, status) 
-            VALUES (?, ?, 'pending')
-        """, (sender_username, receiver_username))
+        # 요청이 없다면 새로운 매칭 요청을 pending 상태 DB에 추가
+        cursor.execute("""INSERT INTO matches (sender_username, receiver_username, status) VALUES (?, ?, 'pending')""", (sender_username, receiver_username))
         conn.commit()
 
     except sqlite3.OperationalError as e:
         print("SQLite OperationalError:", e)
-        return '', 500  # 오류 발생 시, 500 상태 코드 반환
+        return '', 500  # 오류 발생 시
 
     finally:
         conn.close()
 
-    return '', 204  # 요청 성공 시, 빈 응답과 함께 상태 코드 204 반환
+    return '', 204  # 요청 성공 시
 
 @match_bp.route('/accept_request/<int:request_id>', methods=['GET'])
 def accept_request(request_id):
@@ -106,7 +106,7 @@ def accept_request(request_id):
             existing_match = cursor.fetchone()
 
             if not existing_match:
-                # 매칭을 수락, 기존 'pending' 요청을 'accepted'로 변경
+                # 매칭을 수락, 기존 'pending' 요청을 accepted
                 cursor.execute("UPDATE matches SET status = 'accepted' WHERE id = ?", (request_id,))
                 conn.commit()
             else:
