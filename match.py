@@ -38,27 +38,22 @@ def connect(username):
 
    db = sqlite3.connect('Table1.db')
    cursor = db.cursor()
-   cursor.execute("SELECT * FROM user WHERE username = ?",(username,))
-   connect_user = cursor.fetchone()
-   db.close()
-   if connect_user:
-       return render_template('connect.html', user=connect_user)
-   return "사용자를 찾을 수 없습니다."
+   # 받은 매칭 요청
+   cursor.execute(
+        "SELECT id, sender_username FROM matches WHERE receiver_username = ? AND status IS NULL",
+        (username,),
+    )
+   received_requests = cursor.fetchall()
 
-@match_bp.route('/send_request/<receiver_username>', methods=['GET'])
-def send_request(receiver_username):
-   if 'username' not in session:
-        return redirect('/account/')
-   sender_username = session['username']
+    # 매칭된 유저
+   cursor.execute(
+        "SELECT receiver_username FROM matches WHERE sender_username = ? AND status = 'accepted' "
+        "UNION "
+        "SELECT sender_username FROM matches WHERE receiver_username = ? AND status = 'accepted'",
+        (username, username),
+    )
+   confirmed_matches = [row[0] for row in cursor.fetchall()]
 
-   conn = sqlite3.connect('Table1.db')
-   cursor = conn.cursor()
-   try:
-      cursor.execute("INSERT INTO matches (sender_username, receiver_username) VALUES (?, ?)", (sender_username, receiver_username))
-      conn.commit()
-   except sqlite3.IntegrityError:
-        return "매칭 요청을 이미 보냈습니다."
-   finally:
-        conn.close()
+   conn.close()
 
-   return redirect('/match_result/')
+   return render_template('connect.html', received_requests=received_requests,  confirmed_matches=confirmed_matches, )
