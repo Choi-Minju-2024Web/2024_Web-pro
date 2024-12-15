@@ -33,7 +33,7 @@
 		<ul>
 			{% for schedule in schedules %}
 				<li>
-					{{ schedule['title'] }} - {{ schedule['start_time'] }} ~ {{ schedule['end_time'] }}
+					{{ schedule['title'] }} - {{ schedule['description'] }}- {{ schedule['start_time'] }} ~ {{ schedule['end_time'] }}
 					<a href="/schedule/delete/{{ schedule['id'] }}">삭제</a>
 				</li>
 			{% endfor %}

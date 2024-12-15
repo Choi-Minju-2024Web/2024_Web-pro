@@ -1,10 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, session
 import sqlite3
 
-# Blueprint 객체 생성
+# Blueprint 
 schedule_bp = Blueprint('schedule', __name__)
 
-# 데이터베이스 연결 함수
 def get_db_connection():
     conn = sqlite3.connect('Table1.db')
     conn.row_factory = sqlite3.Row  # 결과를 딕셔너리 형식으로 반환
@@ -50,3 +49,20 @@ def delete_schedule(schedule_id):
     conn.close()
 
     return redirect('/schedule/')
+
+# 일정 목록 페이지
+@schedule_bp.route('/schedule/')
+def schedule():
+    if 'username' not in session:
+        return redirect('/account/')
+
+    username = session['username']
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 사용자의 일정 목록 
+    cursor.execute("SELECT * FROM schedules WHERE username = ?", (username,))
+    schedules = cursor.fetchall()
+    conn.close()
+
+    return render_template('schedule.html', username=username, schedules=schedules)
