@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>연락하기</title>
+      <title>Connect</title>
       <meta charset="UTF-8">
    </head>
    <body>
-	<h1>연락하기</h1>
-    <p>연락할 사용자: {{ user[1] }}</p>  <!-- 예시로 user의 이름 출력 -->
-    <p>분야: {{ user[3] }}</p>
-    <p>경험: {{ user[4] }}</p>
-    
+	<h1>매칭 정보</h1>
+    <h2>받은 매칭 요청</h2>
+    <ul>
+        {% for request in received_requests %}
+        <li>
+            <strong>보낸 사람:</strong> {{ request[1] }}<br>
+            <a href="/accept_request/{{ request[0] }}">수락</a>
+            <a href="/reject_request/{{ request[0] }}">거절</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <h2>현재 매칭된 유저</h2>
+    <ul>
+        {% for match in confirmed_matches %}
+        <li>
+            <strong>유저 이름:</strong> {{ match }}
+        </li>
+        {% endfor %}
+    </ul>
     <a href="/dashboard/">대시보드로 돌아가기</a>
    </body>
 </html>

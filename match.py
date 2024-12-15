@@ -44,3 +44,21 @@ def connect(username):
    if connect_user:
        return render_template('connect.html', user=connect_user)
    return "사용자를 찾을 수 없습니다."
+
+@match_bp.route('/send_request/<receiver_username>', methods=['GET'])
+def send_request(receiver_username):
+   if 'username' not in session:
+        return redirect('/account/')
+   sender_username = session['username']
+
+   conn = sqlite3.connect('Table1.db')
+   cursor = conn.cursor()
+   try:
+      cursor.execute("INSERT INTO matches (sender_username, receiver_username) VALUES (?, ?)", (sender_username, receiver_username))
+      conn.commit()
+   except sqlite3.IntegrityError:
+        return "매칭 요청을 이미 보냈습니다."
+   finally:
+        conn.close()
+
+   return redirect('/match_result/')
