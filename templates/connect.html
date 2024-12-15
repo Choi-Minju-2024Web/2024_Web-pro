@@ -14,7 +14,9 @@
             <a href="/accept_request/{{ request[0] }}">수락</a>
             <a href="/reject_request/{{ request[0] }}">거절</a>
         </li>
-        {% endfor %}
+        {% else %}
+    	<p>받은 요청이 없습니다.</p>
+    	{% endfor %}
     </ul>
     <h2>현재 매칭된 유저</h2>
     <ul>
