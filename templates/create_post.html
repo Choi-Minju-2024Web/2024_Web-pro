@@ -4,7 +4,22 @@
         <meta charset="uft-8">
     </head>
     <body>
-            <h1> 게시글 작성</h1>
+        <h1>게시글 작성</h1>
+
+        <form action="/create_post" method="POST">
+            <label for="title">제목:</label>
+            <input type="text" id="title" name="title" required><br>
+    
+            <label for="content">내용:</label>
+            <textarea id="content" name="content" required></textarea><br>
+    
+            <label for="tags">태그:</label>
+            <input type="text" id="tags" name="tags"><br>
+    
+            <button type="submit">완료</button>
+        </form>
+    
+        <a href="/dashboard">뒤로 가기</a>
     </body>
         
 </html>
