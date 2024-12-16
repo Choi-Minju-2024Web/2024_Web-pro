@@ -12,6 +12,13 @@
 		<a href="/dashboard/">Go back to Dashboard</a>
 		<h3>매칭된 사용자와의 일정</h3>
 
+		<h3>매칭된 사용자</h3>
+		<ul>
+			{% for user in matched_users %}
+       			 <li>{{ user['username'] }}</li>
+    		{% endfor %}
+		</ul>
+
 		<h3>새로운 일정 추가</h3>
 		<form action="/schedule/add" method="POST">
 			<label for="title">일정 제목:</label>

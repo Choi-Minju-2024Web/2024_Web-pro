@@ -50,7 +50,6 @@ def delete_schedule(schedule_id):
 
     return redirect('/schedule/')
 
-# 일정 목록 페이지
 @schedule_bp.route('/schedule/')
 def schedule():
     if 'username' not in session:
@@ -60,9 +59,15 @@ def schedule():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 사용자의 일정 목록 
+    # 사용자의 일정 목록
     cursor.execute("SELECT * FROM schedules WHERE username = ?", (username,))
     schedules = cursor.fetchall()
+
+    # 매칭된 사용자 
+    cursor.execute("""SELECT DISTINCT CASE WHEN sender_username = ? THEN receiver_username ELSE sender_username END AS matched_user FROM matches WHERE (sender_username = ? OR receiver_username = ?) AND status = 'accepted'""", (username, username, username))
+    matched_users = [{'username': row['matched_user']} for row in cursor.fetchall()]
+
     conn.close()
 
-    return render_template('schedule.html', username=username, schedules=schedules)
+    return render_template('schedule.html', username=username, schedules=schedules, matched_users=matched_users)
+
