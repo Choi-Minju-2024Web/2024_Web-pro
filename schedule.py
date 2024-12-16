@@ -61,6 +61,10 @@ def schedule():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # 매칭된 사용자
+    cursor.execute("""SELECT DISTINCT CASE WHEN sender_username = ? THEN receiver_username ELSE sender_username END AS matched_user FROM matches WHERE (sender_username = ? OR receiver_username = ?) AND status = 'accepted'""", (username, username, username))
+    matched_users = [row['matched_user'] for row in cursor.fetchall()]
+
     # 개인 일정
     cursor.execute("SELECT * FROM schedules WHERE username = ? AND is_shared = 0", (username,))
     personal_schedules = cursor.fetchall()
@@ -73,6 +77,7 @@ def schedule():
     shared_schedules = cursor.fetchall()
 
     conn.close()
+    matched_users = [{'username': user} for user in matched_users]
 
     return render_template(
         'schedule.html', username=username,
