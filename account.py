@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, session
 import sqlite3 #SQLite 데이터베이스를 사용하기 위함
 from match import match_bp
 from schedule import schedule_bp 
+from dashboard import dashboard_bp 
 
 # 경로설정
 app = Flask(__name__)
@@ -12,6 +13,7 @@ app.secret_key = 'secret_key'
 # Blueprint 등록
 app.register_blueprint(match_bp)
 app.register_blueprint(schedule_bp)
+app.register_blueprint(dashboard_bp)
 
 
 @app.route('/')
@@ -55,12 +57,15 @@ def account():
 def login():
    username = request.form.get('username')
    password = request.form.get('password')
+
    db = sqlite3.connect('Table1.db')
    cursor = db.cursor()
    cursor.execute('SELECT * FROM user WHERE username = ? AND password = ?', (username,password))
+
    # 가입된 유저 정보 가져오기
    user = cursor.fetchone()
    db.close()
+   
    if user:
       #로그인 성공
       session['username']= username
