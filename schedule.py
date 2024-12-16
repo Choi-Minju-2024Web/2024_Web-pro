@@ -20,15 +20,17 @@ def add_schedule():
     description = request.form['description']
     start_time = request.form['start_time']
     end_time = request.form['end_time']
+    is_shared = int(request.form.get('is_shared', 0))
+    team_name = request.form.get('team_name', None)
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # 일정 데이터 삽입
     cursor.execute("""
-        INSERT INTO schedules (username, title, description, start_time, end_time)
-        VALUES (?, ?, ?, ?, ?)
-    """, (username, title, description, start_time, end_time))
+        INSERT INTO schedules (username, title, description, start_time, end_time, is_shared, team_name)
+        VALUES (?, ?, ?, ?, ?,?,?)
+    """, (username, title, description, start_time, end_time, is_shared, team_name))
     conn.commit()
     conn.close()
 

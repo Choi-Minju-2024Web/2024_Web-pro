@@ -33,14 +33,27 @@
 			<label for="end_time">종료 시간:</label>
 			<input type="datetime-local" name="end_time" id="end_time" required><br>
 	
+			<label>공유 일정: <input type="checkbox" name="is_shared" value="1"></label><br>
+			<label>팀 이름 (공유 일정일 경우): <input type="text" name="team_name"></label><br>
 			<button type="submit">일정 추가</button>
 		</form>
 	
 		<h3>내 일정 목록</h3>
+		<h2>개인 일정</h2>
 		<ul>
-			{% for schedule in schedules %}
+			{% for schedule in personal_schedules %}
 				<li>
-					{{ schedule['title'] }} - {{ schedule['description'] }}- {{ schedule['start_time'] }} ~ {{ schedule['end_time'] }}
+					{{ schedule['title'] }} ({{ schedule['start_time'] }} ~ {{ schedule['end_time'] }})
+					<a href="/schedule/delete/{{ schedule['id'] }}">삭제</a>
+				</li>
+			{% endfor %}
+		</ul>
+	
+		<h2>공유 일정</h2>
+		<ul>
+			{% for schedule in shared_schedules %}
+				<li>
+					[{{ schedule['team_name'] }}] {{ schedule['title'] }} ({{ schedule['start_time'] }} ~ {{ schedule['end_time'] }})
 					<a href="/schedule/delete/{{ schedule['id'] }}">삭제</a>
 				</li>
 			{% endfor %}
