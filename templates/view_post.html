@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post['title'] }}</title>
+</head>
+<body>
+    <h1>제목 : {{ post['title'] }}</h1>
+    <div>
+        <h3>내용:</h3>
+        <p>{{ post['content'] }}</p>
+    </div>
+    <p><strong>태그:</strong> {{ post['tags'] }}</p>
+    <p><strong>작성일:</strong> {{ post['created_at'] }}</p>
+    <p><strong>수정일:</strong> {{ post['updated_at'] }}</p>
+    
+    
+    <a href="{{ url_for('dashboard.dashboard') }}">게시판으로 돌아가기</a>
+
+    {% if session['username'] == post['username'] %}
+    <form action="{{ url_for('dashboard.delete_post', post_id=post['id']) }}" method="POST">
+        <button type="submit">게시글 삭제</button>
+    </form>
+    <a href="{{ url_for('dashboard.edit_post', post_id=post['id']) }}">게시글 수정</a>
+{% endif %}
+
+</body>
+</html>

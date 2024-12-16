@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, Blueprint
+from flask import Flask, render_template, request, redirect, session, Blueprint, url_for
 import sqlite3
 
 # Blueprint 객체 생성
@@ -6,29 +6,12 @@ dashboard_bp = Blueprint('dashboard', __name__)
 
 # 데이터베이스 연결 함수
 def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row  # 결과를 딕셔너리 형식으로 반환
+    conn = sqlite3.connect('Table1.db')
+    conn.row_factory = sqlite3.Row
     return conn
 
-def create_tables():
-    conn=sqlite3.connect('Table1.db')
-    cursor=conn.cursor()
-        # posts 테이블 생성
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS posts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            content TEXT NOT NULL,
-            tags TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-    ''')
-    conn.commit()
-    conn.close()
-
-create_tables()
-
+# view_dashboard
+@dashboard_bp.route('/dashboard/')
 def dashboard():
     if 'username' not in session:
         return redirect('/account/')
@@ -36,14 +19,16 @@ def dashboard():
     conn =get_db_connection()
     cursor = conn.cursor()
 
+    # 현재 사용자 데이터 가져오기
     cursor.execute("SELECT * FROM user WHERE username = ?", (session['username'],))
     user_data = cursor.fetchone()
 
-    cursor.execute("SELECT * FROM posts")  # posts 테이블에서 모든 게시물 가져오기
+    # 게시판 데이터 가져오기
+    cursor.execute("SELECT * FROM posts")
     posts = cursor.fetchall()
 
     conn.close()
-    return render_template('dashboard.html', user= user_data, posts = posts)
+    return render_template('dashboard.html', user= user_data,username=session['username'], posts = posts)
 
  # 게시글 작성
 @dashboard_bp.route('/create_post/', methods=['GET', 'POST'])
@@ -56,12 +41,12 @@ def create_post():
         content = request.form['content']
         tags = request.form['tags']
 
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('Table1.db')
         cursor = conn.cursor()
 
         # 데이터베이스에 게시글 추가
-        cursor.execute('''INSERT INTO posts (title, content, tags) VALUES (?, ?, ?)''', 
-                           (title, content, tags))
+        cursor.execute('''INSERT INTO posts (title, content, tags,username) VALUES (?, ?, ?, ?)''', 
+                           (title, content, tags,session['username']))
         conn.commit()
 
         # 게시글 ID를 얻고, 해당 게시글로 리디렉션
@@ -74,8 +59,105 @@ def create_post():
     
 # 게시글 상세 페이지
 @dashboard_bp.route('/post/<int:post_id>')
-def post(post_id):
-    conn = get_db_connection()
-    post = conn.execute('SELECT * FROM posts WHERE id = ?', (post_id,)).fetchone()
+def view_post(post_id):
+    if 'username' not in session:
+        return redirect('/account/')
+    
+    conn = sqlite3.connect('Table1.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # 게시글 데이터 가져오기
+    cursor.execute("SELECT * FROM posts WHERE id = ?", (post_id,))
+    post = cursor.fetchone()
+
     conn.close()
-    return render_template('post.html', post=post)
+
+    if not post:
+        return "게시글을 찾을 수 없습니다.", 404
+
+    return render_template('view_post.html', post=post)
+
+# 게시글 삭제 
+@dashboard_bp.route('/post/<int:post_id>/delete', methods=['POST'])
+def delete_post(post_id):
+    if 'username' not in session:
+        return redirect('/account/')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 게시글 정보 가져오기
+    cursor.execute('SELECT * FROM posts WHERE id = ?', (post_id,))
+    post = cursor.fetchone()
+
+    if post and post['username'] == session['username']:  # 게시글이 존재하고, 작성자가 현재 로그인한 사용자와 동일한 경우
+        # 게시글 삭제
+        cursor.execute('DELETE FROM posts WHERE id = ?', (post_id,))
+        conn.commit()
+
+    conn.close()
+
+    # 게시글 삭제 후 게시판 페이지로 리디렉션
+    return redirect('/dashboard/')
+
+# 게시글 수정
+@dashboard_bp.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    if 'username' not in session:
+        return redirect('/account/')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 게시글 가져오기
+    cursor.execute("SELECT * FROM posts WHERE id = ?", (post_id,))
+    post = cursor.fetchone()
+
+    if not post:
+        return "게시글이 존재하지 않습니다.", 404
+
+    # 수정 처리
+    if request.method == 'POST':
+        new_title = request.form['title']
+        new_content = request.form['content']
+        new_tags = request.form['tags']
+
+        cursor.execute('''
+            UPDATE posts 
+            SET title = ?, content = ?, tags = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?''',
+            (new_title, new_content, new_tags, post_id)
+        )
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('dashboard.view_post', post_id=post_id))  # 게시글 상세 페이지로 이동
+
+    # GET 요청일 때, 게시글 데이터를 불러와 수정 페이지에 표시
+    cursor.execute("SELECT * FROM posts WHERE id = ? AND username = ?", (post_id, session['username']))
+    post = cursor.fetchone()
+    conn.close()
+
+    return render_template('edit_post.html', post=post)
+
+# 태그 검색
+@dashboard_bp.route('/search', methods=['GET'])
+def search_posts():
+    if 'username' not in session:
+        return redirect('/account/')
+
+    # 사용자가 입력한 태그를 가져옴
+    tag = request.args.get('tag', '').strip()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 태그가 포함된 게시글 검색
+    cursor.execute("SELECT * FROM posts WHERE tags LIKE ?", (f'%{tag}%',))
+    posts = cursor.fetchall()
+
+    conn.close()
+
+    # 검색 결과를 게시판 페이지에 표시
+    return render_template('dashboard.html', posts=posts, tag=tag)
