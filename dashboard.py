@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, Blueprint
+from flask import Flask, render_template, request, redirect, session, Blueprint, url_for
 import sqlite3
 
 # Blueprint 객체 생성
@@ -101,13 +101,13 @@ def delete_post(post_id):
     # 게시글 삭제 후 게시판 페이지로 리디렉션
     return redirect('/dashboard/')
 
-# 게시글 수정정
+# 게시글 수정
 @dashboard_bp.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
 def edit_post(post_id):
     if 'username' not in session:
         return redirect('/account/')
 
-    conn = sqlite3.connect('Table1.db')
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     # 게시글 가져오기
@@ -132,9 +132,13 @@ def edit_post(post_id):
         conn.commit()
         conn.close()
 
-        return redirect('/dashboard/')
+        return redirect(url_for('dashboard.view_post', post_id=post_id))  # 게시글 상세 페이지로 이동
 
+    # GET 요청일 때, 게시글 데이터를 불러와 수정 페이지에 표시
+    cursor.execute("SELECT * FROM posts WHERE id = ? AND username = ?", (post_id, session['username']))
+    post = cursor.fetchone()
     conn.close()
+
     return render_template('edit_post.html', post=post)
 
 # 태그 검색
