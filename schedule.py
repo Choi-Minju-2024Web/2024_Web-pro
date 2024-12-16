@@ -21,7 +21,7 @@ def add_schedule():
     start_time = request.form['start_time']
     end_time = request.form['end_time']
     is_shared = int(request.form.get('is_shared', 0))
-    team_name = request.form.get('team_name', None)
+    team_name = request.form.get('team_name', None) if is_shared else None
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -61,15 +61,29 @@ def schedule():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 사용자의 일정 목록
-    cursor.execute("SELECT * FROM schedules WHERE username = ?", (username,))
-    schedules = cursor.fetchall()
+    # 개인 일정
+    cursor.execute("SELECT * FROM schedules WHERE username = ? AND is_shared = 0", (username,))
+    personal_schedules = cursor.fetchall()
 
-    # 매칭된 사용자 
-    cursor.execute("""SELECT DISTINCT CASE WHEN sender_username = ? THEN receiver_username ELSE sender_username END AS matched_user FROM matches WHERE (sender_username = ? OR receiver_username = ?) AND status = 'accepted'""", (username, username, username))
+    # 매칭된 사용자
+    cursor.execute("""
+        SELECT DISTINCT 
+            CASE WHEN sender_username = ? THEN receiver_username ELSE sender_username END AS matched_user 
+        FROM matches 
+        WHERE (sender_username = ? OR receiver_username = ?) AND status = 'accepted'
+    """, (username, username, username))
     matched_users = [{'username': row['matched_user']} for row in cursor.fetchall()]
+
+    # 공유 일정
+    cursor.execute("SELECT * FROM schedules WHERE is_shared = 1")
+    shared_schedules = cursor.fetchall()
 
     conn.close()
 
-    return render_template('schedule.html', username=username, schedules=schedules, matched_users=matched_users)
+    return render_template(
+        'schedule.html', 
+        personal_schedules=personal_schedules, 
+        shared_schedules=shared_schedules, 
+        matched_users=matched_users
+    )
 
