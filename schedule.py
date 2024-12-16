@@ -64,24 +64,18 @@ def schedule():
     # 개인 일정
     cursor.execute("SELECT * FROM schedules WHERE username = ? AND is_shared = 0", (username,))
     personal_schedules = cursor.fetchall()
-
-    # 매칭된 사용자
     cursor.execute("""
-        SELECT DISTINCT 
-            CASE WHEN sender_username = ? THEN receiver_username ELSE sender_username END AS matched_user 
-        FROM matches 
-        WHERE (sender_username = ? OR receiver_username = ?) AND status = 'accepted'
-    """, (username, username, username))
-    matched_users = [{'username': row['matched_user']} for row in cursor.fetchall()]
+    SELECT DISTINCT CASE WHEN sender_username = ? THEN receiver_username ELSE sender_username END AS matched_user FROM matches WHERE (sender_username = ? OR receiver_username = ?) AND status = 'accepted'""", (username, username, username))
+    matched_users = [row['matched_user'] for row in cursor.fetchall()]
 
-    # 공유 일정
-    cursor.execute("SELECT * FROM schedules WHERE is_shared = 1")
+# 공유 일정 가져오기 (매칭된 사용자와 관련된 일정만)
+    cursor.execute("""SELECT * FROM schedules WHERE is_shared = 1 AND (username = ? OR team_name IN (SELECT team_name FROM schedules WHERE username IN ({matched_users})))""".format(matched_users=','.join(['?'] * len(matched_users))), [username] + matched_users)
     shared_schedules = cursor.fetchall()
 
     conn.close()
 
     return render_template(
-        'schedule.html', 
+        'schedule.html', username=username,
         personal_schedules=personal_schedules, 
         shared_schedules=shared_schedules, 
         matched_users=matched_users
